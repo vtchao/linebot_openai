@@ -53,17 +53,24 @@ def callback():
 
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
+# 在程式的最開始添加一個全域變數
+first_time_response_sent = False
+
+# 處理訊息
+@handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    global first_time_response_sent
     msg = event.message.text
     try:
-        # 將回應預設為 "我是你的知心書友"
-        default_response = "我是你的知心書友📖，今天你的心情如何？😉"
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(default_response))
-        
-        # 使用原本的 GPT_response 函數來處理後續訊息
-        GPT_answer = GPT_response(msg)
-        print(GPT_answer)
-        line_bot_api.push_message(event.source.user_id, TextSendMessage(GPT_answer))
+        if not first_time_response_sent:
+            # 第一次回覆 "我是你的知心書友"
+            line_bot_api.reply_message(event.reply_token, TextSendMessage("我是你的知心書友"))
+            first_time_response_sent = True
+        else:
+            # 之後的對話由 GPT 回覆
+            GPT_answer = GPT_response(msg)
+            print(GPT_answer)
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(GPT_answer))
     except Exception as e:
         print(f'Error: {str(e)}')
         line_bot_api.reply_message(event.reply_token, TextSendMessage(f'發生錯誤：{str(e)}'))
