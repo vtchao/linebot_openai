@@ -2,7 +2,3 @@ line-bot-sdk
 flask
 openai==0.28.1
 gunicorn
-PyPDF2
-langchain
-faiss-cpu
-tiktoken
