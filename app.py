@@ -56,13 +56,17 @@ def callback():
 def handle_message(event):
     msg = event.message.text
     try:
+        # 將回應預設為 "我是你的知心書友"
+        default_response = "我是你的知心書友📖，今天你的心情如何？😉"
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(default_response))
+        
+        # 使用原本的 GPT_response 函數來處理後續訊息
         GPT_answer = GPT_response(msg)
         print(GPT_answer)
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(GPT_answer))
-    except:
-        print(traceback.exec_format())
-        line_bot_api.reply_message(event.reply_token, TextSendMessage('你所使用的OPENAI API key額度可能已經超過，請於後台Log內確認錯誤訊息'))
-        
+        line_bot_api.push_message(event.source.user_id, TextSendMessage(GPT_answer))
+    except Exception as e:
+        print(f'Error: {str(e)}')
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(f'發生錯誤：{str(e)}'))
 
 @handler.add(PostbackEvent)
 def handle_message(event):
