@@ -1,4 +1,3 @@
-
 ##每天會推播一次詢問心情
 ##之後都改用gpt回答
 from flask import Flask, request, abort
