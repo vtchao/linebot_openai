@@ -63,7 +63,7 @@ def handle_message(event):
         # 檢查用戶是否需要提醒
         if user_id not in user_reminder_info or user_reminder_info[user_id]['last_reminder_date'] != datetime.date.today():
             # 第一次提醒或是新的一天，發送提醒
-            line_bot_api.reply_message(event.reply_token, TextSendMessage("我是你的知心書友"))
+            line_bot_api.reply_message(event.reply_token, TextSendMessage("我是你的知心書友📖，今天你的心情如何？😉"))
             
             # 更新提醒資訊
             user_reminder_info[user_id] = {
