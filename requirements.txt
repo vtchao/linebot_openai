@@ -4,3 +4,5 @@ openai < 1.0.0
 gunicorn
 PyPDF2
 langchain
+faiss-cpu
+tiktoken
