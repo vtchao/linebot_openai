@@ -50,27 +50,34 @@ def callback():
         abort(400)
     return 'OK'
 
-
-# 處理訊息
-@handler.add(MessageEvent, message=TextMessage)
-# 在程式的最開始添加一個全域變數
-first_time_response_sent = False
+# 用戶提醒資訊字典，以用戶 ID 為 key，紀錄提醒次數和上次提醒的日期
+user_reminder_info = {}
 
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    global first_time_response_sent
     msg = event.message.text
+    user_id = event.source.user_id
+    
     try:
-        if not first_time_response_sent:
-            # 第一次回覆 "我是你的知心書友"
+        # 檢查用戶是否需要提醒
+        if user_id not in user_reminder_info or user_reminder_info[user_id]['last_reminder_date'] != datetime.date.today():
+            # 第一次提醒或是新的一天，發送提醒
             line_bot_api.reply_message(event.reply_token, TextSendMessage("我是你的知心書友"))
-            first_time_response_sent = True
+            
+            # 更新提醒資訊
+            user_reminder_info[user_id] = {
+                'reminder_count': 1,
+                'last_reminder_date': datetime.date.today()
+            }
         else:
-            # 之後的對話由 GPT 回覆
+            # 已經提醒過，使用 GPT 回應
             GPT_answer = GPT_response(msg)
-            print(GPT_answer)
             line_bot_api.reply_message(event.reply_token, TextSendMessage(GPT_answer))
+            
+            # 更新提醒次數
+            user_reminder_info[user_id]['reminder_count'] += 1
+            
     except Exception as e:
         print(f'Error: {str(e)}')
         line_bot_api.reply_message(event.reply_token, TextSendMessage(f'發生錯誤：{str(e)}'))
