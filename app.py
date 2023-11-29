@@ -19,6 +19,9 @@ import traceback
 from PyPDF2 import PdfReader
 import requests
 import fitz
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.vectorstores import ElasticVectorSearch, Pinecone, Weaviate, FAISS
 #======python的函數庫==========
 
 app = Flask(__name__)
@@ -42,7 +45,29 @@ with open('bookALL.pdf', 'wb') as pdf_file:
 reader = PdfReader('bookALL.pdf')
 
 # 接下來的程式碼保持不變
+# read data from the file and put them into a variable called raw_text
+raw_text = ''
+for i, page in enumerate(reader.pages):
+    text = page.extract_text()
+    if text:
+        raw_text += text
 
+text_splitter = CharacterTextSplitter(
+    separator="\n",
+    chunk_size=500,
+    chunk_overlap=50,
+    length_function=len,
+)
+texts = text_splitter.split_text(raw_text)
+
+# Download embeddings from OpenAI
+embeddings = OpenAIEmbeddings()
+
+# Create FAISS index
+docsearch = FAISS.from_texts(texts, embeddings)
+
+# Load question answering chain
+chain = load_qa_chain(OpenAI(), chain_type="stuff")
 
 
 def GPT_response(text):
