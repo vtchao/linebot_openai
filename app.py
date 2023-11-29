@@ -18,6 +18,7 @@ import time
 import traceback
 from PyPDF2 import PdfReader
 import requests
+import fitz
 #======python的函數庫==========
 
 app = Flask(__name__)
@@ -36,7 +37,18 @@ response = requests.get(url)
 with open('bookALL.pdf', 'wb') as pdf_file:
     pdf_file.write(response.content)
 
-reader = PdfReader('bookALL.pdf')
+# 使用 PyMuPDF 的 open 方法
+pdf_document = fitz.open('bookALL.pdf')
+
+# 讀取每一頁的文本
+raw_text = ''
+for page_number in range(pdf_document.page_count):
+    page = pdf_document.load_page(page_number)
+    text = page.get_text()
+    raw_text += text
+
+# 關閉文件
+pdf_document.close()
 
 
 def GPT_response(text):
