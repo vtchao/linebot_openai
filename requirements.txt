@@ -2,6 +2,6 @@ line-bot-sdk
 flask
 openai==0.28.1
 gunicorn
-py-pdf-term
+PyPDF2
 faiss
 langchain
