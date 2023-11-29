@@ -4,3 +4,4 @@ openai==0.28.1
 gunicorn
 py-pdf-term
 faiss
+langchain
