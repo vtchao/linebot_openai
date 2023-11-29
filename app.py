@@ -17,6 +17,7 @@ import openai
 import time
 import traceback
 from PyPDF2 import PdfReader
+import requests
 #======python的函數庫==========
 
 app = Flask(__name__)
@@ -27,7 +28,16 @@ line_bot_api = LineBotApi(os.getenv('CHANNEL_ACCESS_TOKEN'))
 handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 # OPENAI API Key初始化設定
 openai.api_key = os.getenv('OPENAI_API_KEY')
-reader = PdfReader('https://github.com/vtchao/linebot_openai/blob/cc4234b3ee10a0f7bea6f68cf18d3d4662c43be7/bookALL.pdf')
+
+#read PDF
+url = 'https://github.com/vtchao/linebot_openai/blob/cc4234b3ee10a0f7bea6f68cf18d3d4662c43be7/bookALL.pdf'
+response = requests.get(url)
+
+with open('bookALL.pdf', 'wb') as pdf_file:
+    pdf_file.write(response.content)
+
+reader = PdfReader('bookALL.pdf')
+
 
 def GPT_response(text):
     # 接收回應
