@@ -16,6 +16,7 @@ import datetime
 import openai
 import time
 import traceback
+from py_pdf_term.pdf import PdfReader
 #======python的函數庫==========
 
 app = Flask(__name__)
@@ -26,7 +27,7 @@ line_bot_api = LineBotApi(os.getenv('CHANNEL_ACCESS_TOKEN'))
 handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 # OPENAI API Key初始化設定
 openai.api_key = os.getenv('OPENAI_API_KEY')
-
+reader = PdfReader('https://github.com/vtchao/linebot_openai/blob/cc4234b3ee10a0f7bea6f68cf18d3d4662c43be7/bookALL.pdf')
 
 def GPT_response(text):
     # 接收回應
@@ -58,28 +59,32 @@ user_reminder_info = {}
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    msg = event.message.text
     user_id = event.source.user_id
-
+    
     try:
+        # 檢查用戶是否需要提醒
         if user_id not in user_reminder_info or user_reminder_info[user_id]['last_reminder_date'] != datetime.date.today():
-            line_bot_api.reply_message(event.reply_token, TextSendMessage("請提供 PDF 文件，我將為你生成書籍介紹。"))
+            # 第一次提醒或是新的一天，發送提醒
+            line_bot_api.reply_message(event.reply_token, TextSendMessage("我是你的知心書友📖，今天你的心情如何？😉"))
+            
+            # 更新提醒資訊
             user_reminder_info[user_id] = {
                 'reminder_count': 1,
                 'last_reminder_date': datetime.date.today()
             }
         else:
-            pdf_url = 'https://github.com/vtchao/linebot_openai/raw/cc4234b3ee10a0f7bea6f68cf18d3d4662c43be7/bookALL.pdf'
-            pdf_response = requests.get(pdf_url)
-            pdf_text = extract_text_from_pdf(pdf_response.content.decode('utf-8'))
-
-            book_description = generate_book_description(pdf_text)
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(book_description))
+            # 已經提醒過，使用 GPT 回應
+            GPT_answer = GPT_response(msg)
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(GPT_answer))
+            
+            # 更新提醒次數
             user_reminder_info[user_id]['reminder_count'] += 1
+            
     except Exception as e:
-        traceback.print_exc()
         print(f'Error: {str(e)}')
         line_bot_api.reply_message(event.reply_token, TextSendMessage(f'發生錯誤：{str(e)}'))
-        
+
 @handler.add(PostbackEvent)
 def handle_message(event):
     print(event.postback.data)
