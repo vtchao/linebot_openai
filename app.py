@@ -16,7 +16,7 @@ import datetime
 import openai
 import time
 import traceback
-from py_pdf_term.pdf import PdfReader
+from PyPDF2 import PdfReader
 #======python的函數庫==========
 
 app = Flask(__name__)
