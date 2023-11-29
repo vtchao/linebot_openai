@@ -30,25 +30,19 @@ handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 # OPENAI API Key初始化設定
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
-#read PDF
-url = 'https://github.com/vtchao/linebot_openai/blob/cc4234b3ee10a0f7bea6f68cf18d3d4662c43be7/bookALL.pdf'
+import requests
+from PyPDF2 import PdfReader
+
+url = 'https://raw.githubusercontent.com/vtchao/linebot_openai/cc4234b3ee10a0f7bea6f68cf18d3d4662c43be7/bookALL.pdf'
 response = requests.get(url)
 
 with open('bookALL.pdf', 'wb') as pdf_file:
     pdf_file.write(response.content)
 
-# 使用 PyMuPDF 的 open 方法
-pdf_document = fitz.open('bookALL.pdf')
+reader = PdfReader('bookALL.pdf')
 
-# 讀取每一頁的文本
-raw_text = ''
-for page_number in range(pdf_document.page_count):
-    page = pdf_document.load_page(page_number)
-    text = page.get_text()
-    raw_text += text
+# 接下來的程式碼保持不變
 
-# 關閉文件
-pdf_document.close()
 
 
 def GPT_response(text):
