@@ -5,3 +5,4 @@ gunicorn
 PyPDF2
 faiss
 langchain
+requests
