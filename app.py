@@ -21,7 +21,7 @@ import requests
 import fitz
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores import ElasticVectorSearch, Pinecone, Weaviate, FAISS
+from langchain.vectorstores import FAISS
 #======python的函數庫==========
 
 app = Flask(__name__)
