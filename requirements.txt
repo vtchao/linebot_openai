@@ -5,7 +5,6 @@ openai==0.28.1
 gunicorn
 PyPDF2
 pymupdf
-faiss
 faiss-cpu
 langchain
 requests
